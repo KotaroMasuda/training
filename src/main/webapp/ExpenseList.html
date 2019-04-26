@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta http-equiv="expires" content="0" />
+<title>経費管理ページ</title>
+<link rel="stylesheet" href="css/employeeStyle.css">
+</head>
+<body>
+	<div class="main clearfix">
+		<div id="list">
+			<form id="employeeSelector">
+<!--
+ 				<div>
+					<label for="expenseStatusParam">ステータス:</label>
+					<select name="expenseStatusParam" id="expenseStatusParam">
+					</select>
+				</div>
+-->
+				<div>
+					<label for="applicantParam">申請者検索:</label>
+					<input type="text" maxlength="10" name="applicantParam" id="applicantParam">
+				</div>
+				<div>
+					<label for="expenseTitleParam">タイトル検索:</label>
+					<input type="text" maxlength="30" name="expenseTitleParam" id="expenseTitleParam">
+				</div>
+				<button id="findExpense">検索</button>
+			</form>
+			<p>経費一覧:</p>
+			<div id="expenses"></div>
+			<div id="insertBlock">
+				<button type="button" id="newExpense">新規申請</button>
+			</div>
+            <div>
+				<button id="downloadCsv" onclick="location.href='api/employees/csv'">CSVファイルに出力</button>
+            </div>
+		</div>
+	</div>
+
+	<script src="js/jquery-3.3.1.min.js"></script>
+	<script src="js/employee.js"></script>
+
+</body>
+</html>

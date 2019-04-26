@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta http-equiv="expires" content="0" />
+<title>経費管理ページ</title>
+<link rel="stylesheet" href="css/employeeStyle.css">
+</head>
+<body>
+	<div class="main clearfix">
+		<div id="detail">
+			<p>経費詳細データ：</p>
+			<form id="employeeForm" enctype="multipart/form-data">
+				<div class="error"></div>
+				<div>
+					<label for="id">申請ID:</label>
+					<input type="text" name="id" id="id" disabled>
+				</div>
+				<div>
+					<label for="applyYMD">申請日:</label>
+					<input type="text" name="applyYMD" id="applyYMD" placeholder="2019-4-1">
+				</div>
+				<div>
+					<label for="updateYMD">更新日:</label>
+					<input type="text" name="updateYMD" id="updateYMD" placeholder="2019-4-1">
+				</div>
+				<div>
+					<label for="applicant">申請者:</label>
+					<input type="text" maxlength="10" name="applicant" id="applicant">
+				</div>
+				<div>
+					<label for="title">タイトル:</label>
+					<input type="text" maxlength="30" name="title" id="title">
+				</div>
+				<div>
+					<label for="price">金額:</label>
+					<input type="text" name="price" id="price">
+				</div>
+            	<div>
+					<button id="applyExpense">申請</button>
+            	</div>
+			</form>
+		</div>
+	</div>
+
+	<script src="js/jquery-3.3.1.min.js"></script>
+	<script src="js/employee.js"></script>
+
+</body>
+</html>
