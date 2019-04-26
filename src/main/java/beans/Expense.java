@@ -159,24 +159,6 @@ public class Expense {
 		sb.append(",");
 		sb.append(this.getChanger());
 		sb.append(",");
-
-
-		String s = this.getZip();
-		sb.append(s != null ? s : "");
-		sb.append(",");
-		s = this.getPref();
-		sb.append(s != null ? s : "");
-		sb.append(",");
-		s = this.getAddress();
-		sb.append(s != null ? s : "");
-		sb.append(",");
-		sb.append(this.getPost().getId());
-		sb.append(",");
-		String date = this.getEnterDate();
-		sb.append(date != null ? date : "");
-		sb.append(",");
-		date = this.getRetireDate();
-		sb.append(date != null ? date : "");
 		// バッファに書き出します
 		return sb.toString();
 	}

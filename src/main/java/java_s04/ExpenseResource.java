@@ -24,11 +24,14 @@ import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
 import beans.Employee;
+import beans.Expense;
 import beans.Gender;
 import beans.Photo;
 import beans.Post;
 import dao.EmployeeDAO;
+import dao.ExpenseDAO;
 import dao.Param;
+import dao.ParamExp;
 import dao.PhotoDAO;
 import dao.PostDAO;
 
@@ -41,7 +44,7 @@ public class ExpenseResource {
 	private final EmployeeDAO empDao = new EmployeeDAO();
 	private final PostDAO postDao = new PostDAO();
 	private final PhotoDAO photoDao = new PhotoDAO();
-//	private final ExpenseDAO expenseDao = new ExpenseDAO();
+	private final ExpenseDAO expDao = new ExpenseDAO();
 
 	/**
 	 * ID指定で従業員情報を取得する。
@@ -52,8 +55,8 @@ public class ExpenseResource {
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Employee findById(@PathParam("id") int id) {
-		return empDao.findById(id);
+	public Expense findById(@PathParam("id") int id) {
+		return expDao.findById(id);
 	}
 
 	/**
@@ -67,11 +70,12 @@ public class ExpenseResource {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Employee> findByParam(@QueryParam("postId") int postId,
-			@QueryParam("empId") String empId,
-			@QueryParam("nameParam") String nameParam) {
-		Param param = new Param(postId, empId, nameParam);
-		return empDao.findByParam(param);
+	public List<Employee> findByParamExp(
+			@QueryParam("statusId") int statusId,
+			@QueryParam("applicantParam") String applicantParam,
+			@QueryParam("titleParam") String titleParam) {
+		ParamExp paramExp = new ParamExp(statusId, applicantParam, titleParam);
+		return empDao.findByParamExp(paramExp);
 	}
 
 	/**
