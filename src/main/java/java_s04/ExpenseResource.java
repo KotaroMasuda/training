@@ -23,17 +23,13 @@ import org.glassfish.jersey.media.multipart.ContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
-import beans.Employee;
 import beans.Expense;
 import beans.Gender;
 import beans.Photo;
-import beans.Post;
-import dao.EmployeeDAO;
 import dao.ExpenseDAO;
 import dao.Param;
 import dao.ParamExp;
-import dao.PhotoDAO;
-import dao.PostDAO;
+import dao.StatusDAO;
 
 /**
  * 従業員関連のサービス実装。
@@ -41,10 +37,11 @@ import dao.PostDAO;
  */
 @Path("expenses")
 public class ExpenseResource {
-	private final EmployeeDAO empDao = new EmployeeDAO();
-	private final PostDAO postDao = new PostDAO();
-	private final PhotoDAO photoDao = new PhotoDAO();
+//	private final EmployeeDAO empDao = new EmployeeDAO();
+//	private final PostDAO postDao = new PostDAO();
+//	private final PhotoDAO photoDao = new PhotoDAO();
 	private final ExpenseDAO expDao = new ExpenseDAO();
+	private final StatusDAO statusDao = new StatusDAO();
 
 	/**
 	 * ID指定で従業員情報を取得する。
@@ -70,12 +67,12 @@ public class ExpenseResource {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Employee> findByParamExp(
+	public List<Expense> findByParamExp(
 			@QueryParam("statusId") int statusId,
 			@QueryParam("applicantParam") String applicantParam,
 			@QueryParam("titleParam") String titleParam) {
 		ParamExp paramExp = new ParamExp(statusId, applicantParam, titleParam);
-		return empDao.findByParamExp(paramExp);
+		return expDao.findByParamExp(paramExp);
 	}
 
 	/**
@@ -88,51 +85,40 @@ public class ExpenseResource {
 	@POST
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Employee create(final FormDataMultiPart form) throws WebApplicationException {
-		Employee employee = new Employee();
+	public Expense create(final FormDataMultiPart form) throws WebApplicationException {
+		Expense expense = new Expense();
 
-		employee.setId(0);
-		employee.setEmpId(form.getField("empId").getValue());
-		employee.setName(form.getField("name").getValue());
-		employee.setAge(Integer.parseInt(form.getField("age").getValue()));
-		String gender = form.getField("gender").getValue();
-		employee.setGender(Gender.valueOf(gender));
+		expense.setId(0);
+		expense.setExpenseId(form.getField("empId").getValue());
+		expense.setApplicant(form.getField("name").getValue());
+		expense.setTitle((form.getField("age").getValue()));
+		expense.setPayee((form.getField("age").getValue()));
+		expense.setPrice(Integer.parseInt(form.getField("age").getValue()));
+		expense.setChanger((form.getField("age").getValue()));
 
-		employee.setZip(form.getField("zip").getValue());
-		employee.setPref(form.getField("pref").getValue());
-		employee.setAddress(form.getField("address").getValue());
-
-		String enterDateStr = form.getField("enterDate").getValue();
-		if (enterDateStr != null && !enterDateStr.isEmpty()) {
-			employee.setEnterDate(enterDateStr);
+		String applyDateStr = form.getField("enterDate").getValue();
+		if (applyDateStr != null && !applyDateStr.isEmpty()) {
+			expense.setApplyDate(applyDateStr);
 		}
 
-		String retireDateStr = form.getField("retireDate").getValue();
-		if (retireDateStr != null && !retireDateStr.isEmpty()) {
-			employee.setRetireDate(retireDateStr);
+		String changeDateStr = form.getField("retireDate").getValue();
+		if (changeDateStr != null && !changeDateStr.isEmpty()) {
+			expense.setChangeDate(changeDateStr);
 		}
 
-		if (!employee.isValidObject()) {
+		if (!expense.isValidObject()) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 
-		// Photo関連の処理
-		FormDataBodyPart photoPart = form.getField("photo");
-		Photo photo = createPhoto(photoPart);
-		if (photo.getId() == 0) {
+		// Status関連の処理
+		int statusId = Integer.parseInt(form.getField("postId").getValue());
+		beans.Status status = statusDao.findById(statusId);
+		if (status == null) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
-		employee.setPhotoId(photo.getId());
+		expense.setStatus(status);
 
-		// Post関連の処理
-		int postId = Integer.parseInt(form.getField("postId").getValue());
-		Post post = postDao.findById(postId);
-		if (post == null) {
-			throw new WebApplicationException(Response.Status.BAD_REQUEST);
-		}
-		employee.setPost(post);
-
-		return empDao.create(employee);
+		return expDao.create(expense);
 	}
 
 	/**
@@ -145,9 +131,9 @@ public class ExpenseResource {
 	@Path("{id}")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Employee update(@PathParam("id") int id,
+	public Expense update(@PathParam("id") int id,
 			final FormDataMultiPart form) throws WebApplicationException {
-		Employee employee = new Employee();
+		Expense employee = new Expense();
 
 		employee.setId(id);
 		employee.setEmpId(form.getField("empId").getValue());
@@ -185,7 +171,7 @@ public class ExpenseResource {
 
 		// Post関連の処理
 		int postId = Integer.parseInt(form.getField("postId").getValue());
-		Post post = postDao.findById(postId);
+		Status post = postDao.findById(postId);
 		if (post == null) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
@@ -202,7 +188,7 @@ public class ExpenseResource {
 	@DELETE
 	@Path("{id}")
 	public void remove(@PathParam("id") int id) {
-		Employee employee = empDao.findById(id);
+		Expense employee = empDao.findById(id);
 		empDao.remove(id);
 		photoDao.remove(employee.getPhotoId());
 	}
@@ -212,13 +198,13 @@ public class ExpenseResource {
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	public Response downloadCsv() {
 		Param param = new Param(0, "", "");
-		List<Employee> list = empDao.findByParam(param);
+		List<Expense> list = empDao.findByParam(param);
 
 		String header = "ID,社員番号,名前,年齢,性別,写真ID,郵便番号,都道府県,住所,所属部署ID,入社日付,退社日付"
 				+ System.getProperty("line.separator");
 		StringBuffer csvContents = new StringBuffer(header);
 
-		for (Employee employee : list) {
+		for (Expense employee : list) {
 			String line = employee.toString() + System.getProperty("line.separator");
 			csvContents.append(line);
 		}
