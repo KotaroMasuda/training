@@ -8,8 +8,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import beans.Employee;
-import beans.Post;
+import beans.Expense;
+import beans.Status;
 
 /**
  * 社員データを扱うDAO
@@ -18,28 +18,28 @@ public class ExpenseDAO {
 	/**
 	 * クエリ文字列
 	 */
-	private static final String SELECT_ALL_QUERY = "SELECT EMP.ID AS ID, EMP.EMPID, EMP.NAME, EMP.AGE, EMP.GENDER, EMP.PHOTOID, EMP.ZIP, EMP.PREF, EMP.ADDRESS, "
-							+"EMP.POSTID, POST.NAME as POST_NAME, EMP.ENTDATE, EMP.RETDATE "
-							+"FROM EMPLOYEE EMP "
-							+"INNER JOIN POST POST "
-							+"ON EMP.POSTID = POST.ID";
-	private static final String SELECT_BY_ID_QUERY = SELECT_ALL_QUERY + " WHERE EMP.ID = ?";
+	private static final String SELECT_ALL_QUERY = "select \n" + "e.ID as ID, \n" + "e.EXPID, \n" + "e.APPDATE, \n"
+			+ "e.CHANDATE, \n" + "e.APPLICANT, \n" + "e.TITLE, \n" + "e.PAYEE, \n" + "e.PRICE, \n" + "e.STATUSID, \n"
+			+ "s.TYPE as STATUS_TYPE, \n" + "e.CHANGER \n" + "from \n" + "EXPENSE e, \n" + "STATUS s \n" + "where \n"
+			+ "e.STATUSID=s.ID";
+	private static final String SELECT_BY_ID_QUERY = SELECT_ALL_QUERY + " WHERE e.ID = ?";
 	private static final String INSERT_QUERY = "INSERT INTO "
-							+"EMPLOYEE(EMPID, NAME, AGE, GENDER, PHOTOID, ZIP, PREF, ADDRESS, POSTID, ENTDATE, RETDATE) "
-							+"VALUES(?,?,?,?,?,?,?,?,?,?,?)";
-	private static final String UPDATE_QUERY = "UPDATE EMPLOYEE "
-							+"SET EMPID=?,NAME=?,AGE=?,GENDER=?,PHOTOID=?,ZIP=?,PREF=?,"
-							+"ADDRESS=?,POSTID=?,ENTDATE=?,RETDATE=? WHERE ID = ?";
-	private static final String DELETE_QUERY = "DELETE FROM EMPLOYEE WHERE ID = ?";
+			+ "EXPENSE(EXPID, APPDATE, CHANDATE, APPLICANT, TITLE, PAYEE, PRICE, STATUSID, CHANGER) "
+			+ "VALUES(?,?,?,?,?,?,?,?,?)";
+	private static final String UPDATE_QUERY = "UPDATE EXPENSE "
+			+ "SET EXPID=?,APPDATE=?,CHANDATE=?,APPLICANT=?,TITLE=?,PAYEE=?,PRICE=?,"
+			+ "STATUSID=?,CHANGER=? WHERE ID = ?";
+	private static final String DELETE_QUERY = "DELETE FROM EXPENSE WHERE ID = ?";
 
 	/**
 	 * ID指定の検索を実施する。
 	 *
-	 * @param id 検索対象のID
+	 * @param id
+	 *            検索対象のID
 	 * @return 検索できた場合は検索結果データを収めたPostインスタンス。検索に失敗した場合はnullが返る。
 	 */
-	public Employee findById(int id) {
-		Employee result = null;
+	public Expense findById(int id) {
+		Expense result = null;
 
 		Connection connection = ConnectionProvider.getConnection();
 		if (connection == null) {
@@ -64,23 +64,23 @@ public class ExpenseDAO {
 	}
 
 	/**
-	 * パラメータ指定の検索を実施する。
-	 * 有効なパラメータ指定が1つも存在しない場合は全件検索になる。
+	 * パラメータ指定の検索を実施する。 有効なパラメータ指定が1つも存在しない場合は全件検索になる。
 	 *
-	 * @param param 検索用のパラメータを収めたオブジェクト。
+	 * @param paramExp
+	 *            検索用のパラメータを収めたオブジェクト。
 	 * @return 検索結果を収めたList。検索結果が存在しない場合は長さ0のリストが返る。
 	 */
-	public List<Employee> findByParam(Param param) {
-		List<Employee> result = new ArrayList<>();
+	public List<Expense> findByParamExp(ParamExp paramExp) {
+		List<Expense> result = new ArrayList<>();
 
 		Connection connection = ConnectionProvider.getConnection();
 		if (connection == null) {
 			return result;
 		}
 
-		String queryString = SELECT_ALL_QUERY + param.getWhereClause();
+		String queryString = SELECT_ALL_QUERY + paramExp.getWhereClause();
 		try (PreparedStatement statement = connection.prepareStatement(queryString)) {
-			param.setParameter(statement);
+			paramExp.setParameter(statement);
 
 			ResultSet rs = statement.executeQuery();
 
@@ -97,52 +97,53 @@ public class ExpenseDAO {
 	}
 
 	/**
-	 * 指定されたEmployeeオブジェクトを新規にDBに登録する。
-	 * 登録されたオブジェクトにはDB上のIDが上書きされる。
+	 * 指定されたEmployeeオブジェクトを新規にDBに登録する。 登録されたオブジェクトにはDB上のIDが上書きされる。
 	 * 何らかの理由で登録に失敗した場合、IDがセットされない状態（=0）で返却される。
 	 *
-	 * @param Employee 登録対象オブジェクト
+	 * @param Employee
+	 *            登録対象オブジェクト
 	 * @return DB上のIDがセットされたオブジェクト
 	 */
-	public Employee create(Employee employee) {
+	public Expense create(Expense expense) {
 		Connection connection = ConnectionProvider.getConnection();
 		if (connection == null) {
-			return employee;
+			return expense;
 		}
 
 		try (PreparedStatement statement = connection.prepareStatement(INSERT_QUERY, new String[] { "ID" });) {
 			// INSERT実行
-			setParameter(statement, employee, false);
+			setParameter(statement, expense, false);
 			statement.executeUpdate();
 
 			// INSERTできたらKEYを取得
 			ResultSet rs = statement.getGeneratedKeys();
 			rs.next();
 			int id = rs.getInt(1);
-			employee.setId(id);
+			expense.setId(id);
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		} finally {
 			ConnectionProvider.close(connection);
 		}
 
-		return employee;
+		return expense;
 	}
 
 	/**
 	 * 指定されたEmployeeオブジェクトを使ってDBを更新する。
 	 *
-	 * @param employee 更新対象オブジェクト
+	 * @param expense
+	 *            更新対象オブジェクト
 	 * @return 更新に成功したらtrue、失敗したらfalse
 	 */
-	public Employee update(Employee employee) {
+	public Expense update(Expense expense) {
 		Connection connection = ConnectionProvider.getConnection();
 		if (connection == null) {
-			return employee;
+			return expense;
 		}
 
 		try (PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY)) {
-			setParameter(statement, employee, true);
+			setParameter(statement, expense, true);
 			statement.executeUpdate();
 		} catch (SQLException ex) {
 			ex.printStackTrace();
@@ -150,13 +151,14 @@ public class ExpenseDAO {
 			ConnectionProvider.close(connection);
 		}
 
-		return employee;
+		return expense;
 	}
 
 	/**
 	 * 指定されたIDのPostデータを削除する。
 	 *
-	 * @param id 削除対象のPostデータのID
+	 * @param id
+	 *            削除対象のPostデータのID
 	 * @return 削除が成功したらtrue、失敗したらfalse
 	 */
 	public boolean remove(int id) {
@@ -181,37 +183,38 @@ public class ExpenseDAO {
 	/**
 	 * 検索結果からオブジェクトを復元する。
 	 *
-	 * @param rs 検索結果が収められているResultSet。rs.next()がtrueであることが前提。
+	 * @param rs
+	 *            検索結果が収められているResultSet。rs.next()がtrueであることが前提。
 	 * @return 検索結果を収めたオブジェクト
-	 * @throws SQLException 検索結果取得中に何らかの問題が発生した場合に送出される。
+	 * @throws SQLException
+	 *             検索結果取得中に何らかの問題が発生した場合に送出される。
 	 */
-	private Employee processRow(ResultSet rs) throws SQLException {
-		Employee result = new Employee();
+	private Expense processRow(ResultSet rs) throws SQLException {
+		Expense result = new Expense();
 
 		// Employee本体の再現
 		result.setId(rs.getInt("ID"));
-		result.setEmpId(rs.getString("EMPID"));
-		result.setName(rs.getString("NAME"));
-		result.setAge(rs.getInt("AGE"));
-		result.setGenderByInt(rs.getInt("GENDER"));
-		result.setPhotoId(rs.getInt("PHOTOID"));	// Photoオブジェクトに関しては必要になるまで生成しない
-		result.setZip(rs.getString("ZIP"));
-		result.setPref(rs.getString("PREF"));
-		result.setAddress(rs.getString("ADDRESS"));
-		Date entDate = rs.getDate("ENTDATE");
-		if (entDate != null) {
-			result.setEnterDate(entDate.toString());
+		result.setExpenseId(rs.getString("EXPID"));
+		result.setApplicant(rs.getString("APPLICANT"));
+		result.setTitle(rs.getString("TITLE"));
+		result.setPayee(rs.getString("PAYEE"));
+		result.setPrice(rs.getInt("PRICE")); // Photoオブジェクトに関しては必要になるまで生成しない
+		result.setChanger(rs.getString("CHANGER"));
+
+		Date applyDate = rs.getDate("APPDATE");
+		if (applyDate != null) {
+			result.setApplyDate(applyDate.toString());
 		}
-		Date retDate = rs.getDate("RETDATE");
-		if (retDate != null) {
-			result.setRetireDate(retDate.toString());
+		Date changeDate = rs.getDate("CHANDATE");
+		if (changeDate != null) {
+			result.setChangeDate(changeDate.toString());
 		}
 
 		// 入れ子のオブジェクトの再現
-		Post post = new Post();
-		post.setId(rs.getInt("POSTID"));
-		post.setName(rs.getString("POST_NAME"));
-		result.setPost(post);
+		Status status = new Status();
+		status.setId(rs.getInt("STATUSID"));
+		status.setType(rs.getString("STATUS_TYPE"));
+		result.setStatus(status);
 
 		return result;
 	}
@@ -219,36 +222,38 @@ public class ExpenseDAO {
 	/**
 	 * オブジェクトからSQLにパラメータを展開する。
 	 *
-	 * @param statement パラメータ展開対象のSQL
-	 * @param employee パラメータに対して実際の値を供給するオブジェクト
-	 * @param forUpdate 更新に使われるならtrueを、新規追加に使われるならfalseを指定する。
-	 * @throws SQLException パラメータ展開時に何らかの問題が発生した場合に送出される。
+	 * @param statement
+	 *            パラメータ展開対象のSQL
+	 * @param expense
+	 *            パラメータに対して実際の値を供給するオブジェクト
+	 * @param forUpdate
+	 *            更新に使われるならtrueを、新規追加に使われるならfalseを指定する。
+	 * @throws SQLException
+	 *             パラメータ展開時に何らかの問題が発生した場合に送出される。
 	 */
-	private void setParameter(PreparedStatement statement, Employee employee, boolean forUpdate) throws SQLException {
+	private void setParameter(PreparedStatement statement, Expense expense, boolean forUpdate) throws SQLException {
 		int count = 1;
 
-		statement.setString(count++, employee.getEmpId());
-		statement.setString(count++, employee.getName());
-		statement.setInt(count++, employee.getAge());
-		statement.setInt(count++, employee.getGender().ordinal());
-		statement.setInt(count++, employee.getPhotoId());
-		statement.setString(count++, employee.getZip());
-		statement.setString(count++, employee.getPref());
-		statement.setString(count++, employee.getAddress());
-		statement.setInt(count++, employee.getPost().getId());
-		if (employee.getEnterDate() != null) {
-			statement.setDate(count++, Date.valueOf(employee.getEnterDate()));
+		statement.setString(count++, expense.getExpenseId());
+		statement.setString(count++, expense.getApplicant());
+		statement.setString(count++, expense.getTitle());
+		statement.setString(count++, expense.getPayee());
+		statement.setInt(count++, expense.getPrice());
+		statement.setInt(count++, expense.getStatus().getId());
+		statement.setString(count++, expense.getChanger());
+		if (expense.getApplyDate() != null) {
+			statement.setDate(count++, Date.valueOf(expense.getApplyDate()));
 		} else {
 			statement.setDate(count++, null);
 		}
-		if (employee.getRetireDate() != null) {
-			statement.setDate(count++, Date.valueOf(employee.getRetireDate()));
+		if (expense.getChangeDate() != null) {
+			statement.setDate(count++, Date.valueOf(expense.getChangeDate()));
 		} else {
 			statement.setDate(count++, null);
 		}
 
 		if (forUpdate) {
-			statement.setInt(count++, employee.getId());
+			statement.setInt(count++, expense.getId());
 		}
 	}
 }

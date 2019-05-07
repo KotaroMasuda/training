@@ -1,7 +1,5 @@
 package java_s04;
 
-import java.io.InputStream;
-import java.sql.Date;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -16,18 +14,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
-import org.glassfish.jersey.media.multipart.BodyPartEntity;
-import org.glassfish.jersey.media.multipart.ContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
 import beans.Expense;
-import beans.Gender;
-import beans.Photo;
 import dao.ExpenseDAO;
-import dao.Param;
 import dao.ParamExp;
 import dao.StatusDAO;
 
@@ -133,51 +124,39 @@ public class ExpenseResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Expense update(@PathParam("id") int id,
 			final FormDataMultiPart form) throws WebApplicationException {
-		Expense employee = new Expense();
+		Expense expense = new Expense();
 
-		employee.setId(id);
-		employee.setEmpId(form.getField("empId").getValue());
-		employee.setName(form.getField("name").getValue());
-		employee.setAge(Integer.parseInt(form.getField("age").getValue()));
-		String gender = form.getField("gender").getValue();
-		employee.setGender(Gender.valueOf(gender));
+		expense.setId(id);
+		expense.setExpenseId(form.getField("expenseId").getValue());
+		expense.setApplicant(form.getField("applicant").getValue());
+		expense.setTitle((form.getField("title").getValue()));
+		expense.setPayee((form.getField("payee").getValue()));
+		expense.setPrice(Integer.parseInt(form.getField("price").getValue()));
+		expense.setChanger((form.getField("changer").getValue()));
 
-		employee.setZip(form.getField("zip").getValue());
-		employee.setPref(form.getField("pref").getValue());
-		employee.setAddress(form.getField("address").getValue());
-
-		String enterDateStr = form.getField("enterDate").getValue();
-		if (enterDateStr != null && !enterDateStr.isEmpty()) {
-			employee.setEnterDate(enterDateStr);
+		String applyDateStr = form.getField("applyDate").getValue();
+		if (applyDateStr != null && !applyDateStr.isEmpty()) {
+			expense.setApplyDate(applyDateStr);
 		}
 
-		String retireDateStr = form.getField("retireDate").getValue();
-		if (retireDateStr != null && !retireDateStr.isEmpty()) {
-			employee.setRetireDate(retireDateStr);
+		String changeDateStr = form.getField("changeDate").getValue();
+		if (changeDateStr != null && !changeDateStr.isEmpty()) {
+			expense.setChangeDate(changeDateStr);
 		}
 
-		if (!employee.isValidObject()) {
+		if (!expense.isValidObject()) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
 
-		// Photo関連の処理
-		String photoIdSrc = form.getField("photoId").getValue();
-		int photoId = Integer.parseInt(photoIdSrc);
-		FormDataBodyPart photoPart = form.getField("photo");
-		if (!photoPart.getContentDisposition().getFileName().isEmpty()) {
-			updatePhoto(photoId, photoPart);
-		}
-		employee.setPhotoId(photoId);
-
-		// Post関連の処理
-		int postId = Integer.parseInt(form.getField("postId").getValue());
-		Status post = postDao.findById(postId);
-		if (post == null) {
+		// Status関連の処理
+		int statusId = Integer.parseInt(form.getField("statusId").getValue());
+		beans.Status status = statusDao.findById(statusId);
+		if (status == null) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 		}
-		employee.setPost(post);
+		expense.setStatus(status);
 
-		return empDao.update(employee);
+		return expDao.update(expense);
 	}
 
 	/**
@@ -188,77 +167,76 @@ public class ExpenseResource {
 	@DELETE
 	@Path("{id}")
 	public void remove(@PathParam("id") int id) {
-		Expense employee = empDao.findById(id);
-		empDao.remove(id);
-		photoDao.remove(employee.getPhotoId());
+		Expense expense = expDao.findById(id);
+		expDao.remove(id);
 	}
 
-	@GET
-	@Path("csv")
-	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public Response downloadCsv() {
-		Param param = new Param(0, "", "");
-		List<Expense> list = empDao.findByParam(param);
-
-		String header = "ID,社員番号,名前,年齢,性別,写真ID,郵便番号,都道府県,住所,所属部署ID,入社日付,退社日付"
-				+ System.getProperty("line.separator");
-		StringBuffer csvContents = new StringBuffer(header);
-
-		for (Expense employee : list) {
-			String line = employee.toString() + System.getProperty("line.separator");
-			csvContents.append(line);
-		}
-
-		return Response.status(Status.OK)
-				.entity(csvContents.toString())
-				.header("Content-disposition", "attachment; filename=employee.csv")
-				.build();
-	}
-
-	/**
-	 * Formから渡されたデータを使用してPhotoデータを登録する。
-	 *
-	 * @param photoPart Formから渡されたPhotoデータ
-	 * @return 登録されてIDが振られたPhotoインスタンス
-	 */
-	private Photo createPhoto(FormDataBodyPart photoPart) {
-		Photo photo = build(photoPart);
-
-		return photoDao.create(photo);
-	}
-
-	/**
-	 * Formから渡されたデータを使用してPhotoデータを更新する。
-	 *
-	 * @param photoId 更新対象のPhotoのID
-	 * @param photoPart Formから渡されたPhotoデータ
-	 * @return 正常に更新された場合はtrue、失敗した場合はfalse
-	 */
-	private boolean updatePhoto(int photoId, FormDataBodyPart photoPart) {
-		Photo photo = build(photoPart);
-		photo.setId(photoId);
-		return photoDao.update(photo);
-	}
-
-	/**
-	 * formから渡されたデータを使用してPhotoインスタンスを構築する。
-	 *
-	 * @param photoPart Formから渡されたPhotoデータ
-	 * @return ID以外のフィールドに値がセットされたPhotoインスタンス
-	 */
-	private Photo build(FormDataBodyPart photoPart) {
-		Photo photo = new Photo();
-		ContentDisposition photoInfo = photoPart.getContentDisposition();
-
-		photo.setFileName(photoInfo.getFileName());
-
-		photo.setContentType(photoPart.getMediaType().toString());
-
-		BodyPartEntity bodyPartEntity = (BodyPartEntity)photoPart.getEntity();
-		InputStream in = bodyPartEntity.getInputStream();
-		photo.setPhoto(in);
-
-		photo.setEntryDate(new Date(System.currentTimeMillis()));
-		return photo;
-	}
+//	@GET
+//	@Path("csv")
+//	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+//	public Response downloadCsv() {
+//		Param param = new Param(0, "", "");
+//		List<Expense> list = expDao.findByParam(param);
+//
+//		String header = "ID,社員番号,名前,年齢,性別,写真ID,郵便番号,都道府県,住所,所属部署ID,入社日付,退社日付"
+//				+ System.getProperty("line.separator");
+//		StringBuffer csvContents = new StringBuffer(header);
+//
+//		for (Expense employee : list) {
+//			String line = employee.toString() + System.getProperty("line.separator");
+//			csvContents.append(line);
+//		}
+//
+//		return Response.status(Status.OK)
+//				.entity(csvContents.toString())
+//				.header("Content-disposition", "attachment; filename=employee.csv")
+//				.build();
+//	}
+//
+//	/**
+//	 * Formから渡されたデータを使用してPhotoデータを登録する。
+//	 *
+//	 * @param photoPart Formから渡されたPhotoデータ
+//	 * @return 登録されてIDが振られたPhotoインスタンス
+//	 */
+//	private Photo createPhoto(FormDataBodyPart photoPart) {
+//		Photo photo = build(photoPart);
+//
+//		return photoDao.create(photo);
+//	}
+//
+//	/**
+//	 * Formから渡されたデータを使用してPhotoデータを更新する。
+//	 *
+//	 * @param photoId 更新対象のPhotoのID
+//	 * @param photoPart Formから渡されたPhotoデータ
+//	 * @return 正常に更新された場合はtrue、失敗した場合はfalse
+//	 */
+//	private boolean updatePhoto(int photoId, FormDataBodyPart photoPart) {
+//		Photo photo = build(photoPart);
+//		photo.setId(photoId);
+//		return photoDao.update(photo);
+//	}
+//
+//	/**
+//	 * formから渡されたデータを使用してPhotoインスタンスを構築する。
+//	 *
+//	 * @param photoPart Formから渡されたPhotoデータ
+//	 * @return ID以外のフィールドに値がセットされたPhotoインスタンス
+//	 */
+//	private Photo build(FormDataBodyPart photoPart) {
+//		Photo photo = new Photo();
+//		ContentDisposition photoInfo = photoPart.getContentDisposition();
+//
+//		photo.setFileName(photoInfo.getFileName());
+//
+//		photo.setContentType(photoPart.getMediaType().toString());
+//
+//		BodyPartEntity bodyPartEntity = (BodyPartEntity)photoPart.getEntity();
+//		InputStream in = bodyPartEntity.getInputStream();
+//		photo.setPhoto(in);
+//
+//		photo.setEntryDate(new Date(System.currentTimeMillis()));
+//		return photo;
+//	}
 }

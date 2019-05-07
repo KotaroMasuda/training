@@ -17,11 +17,11 @@ public class StatusDAO {
 	/**
 	 * クエリ文字列
 	 */
-	private static final String SELECT_ALL_QUERY = "SELECT ID, NAME FROM POST ORDER BY ID";
-	private static final String SELECT_BY_ID_QUERY = "SELECT ID, NAME FROM POST WHERE ID = ?";
-	private static final String INSERT_QUERY = "INSERT INTO POST(NAME) VALUES (?)";
-	private static final String UPDATE_QUERY = "UPDATE POST SET NAME = ? WHERE ID = ?";
-	private static final String DELETE_QUERY = "DELETE FROM POST WHERE ID = ?";
+	private static final String SELECT_ALL_QUERY = "SELECT ID, TYPE FROM STATUS ORDER BY ID";
+	private static final String SELECT_BY_ID_QUERY = "SELECT ID, TYPE FROM STATUS WHERE ID = ?";
+	private static final String INSERT_QUERY = "INSERT INTO STATUS(TYPE) VALUES (?)";
+	private static final String UPDATE_QUERY = "UPDATE STATUS SET TYPE= ? WHERE ID = ?";
+	private static final String DELETE_QUERY = "DELETE FROM STATUS WHERE ID = ?";
 
 	/**
 	 * 部署の全件を取得する。

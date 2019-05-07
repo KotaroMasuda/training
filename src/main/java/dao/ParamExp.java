@@ -53,7 +53,7 @@ public class ParamExp {
 			} else {
 				whereClause.append(" AND ");
 			}
-			whereClause.append("EMP.POSTID = ?");
+			whereClause.append("E.STATUSID = ?");
 		}
 		if (!applicantParam.isEmpty()) {
 			if (whereClause.length() == 0) {
@@ -61,7 +61,7 @@ public class ParamExp {
 			} else {
 				whereClause.append(" AND ");
 			}
-			whereClause.append("EMP.EMPID LIKE ?");
+			whereClause.append("E.APPLICANT LIKE ?");
 		}
 		if (!titleParam.isEmpty()) {
 			if (whereClause.length() == 0) {
@@ -69,11 +69,11 @@ public class ParamExp {
 			} else {
 				whereClause.append(" AND ");
 			}
-			whereClause.append("EMP.NAME LIKE ?");
+			whereClause.append("E.TITLE LIKE ?");
 		}
 
 		// ORDER BYは最後に指定する
-		whereClause.append(" ORDER BY EMP.ID");
+		whereClause.append(" ORDER BY E.ID");
 
 		return whereClause.toString();
 	}
