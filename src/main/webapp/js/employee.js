@@ -179,7 +179,7 @@ function renderTable(data) {
 			row.append($('<td>').text(employee.empId));
 			row.append($('<td>').text(employee.name));
 			row.append($('<td>').append(
-					$('<button>').text("kokoko").attr("type","reset").attr("onclick", "findById("+employee.id+')')
+					$('<button>').text("編集").attr("type","button").attr("onclick", "findById("+employee.id+')')
 				));
 			row.append($('<td>').append(
 					$('<button>').text("削除").attr("type","button").attr("onclick", "deleteById("+employee.id+')')

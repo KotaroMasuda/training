@@ -20,15 +20,14 @@ public class ExpenseDAO {
 	 */
 	private static final String SELECT_ALL_QUERY = "select \n" + "e.ID as ID, \n" + "e.EXPID, \n" + "e.APPDATE, \n"
 			+ "e.CHANDATE, \n" + "e.APPLICANT, \n" + "e.TITLE, \n" + "e.PAYEE, \n" + "e.PRICE, \n" + "e.STATUSID, \n"
-			+ "s.TYPE as STATUS_TYPE, \n" + "e.CHANGER \n" + "from \n" + "EXPENSE e, \n" + "STATUS s \n" + "where \n"
-			+ "e.STATUSID=s.ID";
-	private static final String SELECT_BY_ID_QUERY = SELECT_ALL_QUERY + " WHERE e.ID = ?";
+			+ "s.TYPE as STATUS_TYPE, \n" + "e.CHANGER from EXPENSE e, STATUS s ";
+	private static final String SELECT_BY_ID_QUERY = SELECT_ALL_QUERY + " WHERE e.STATUSID=s.ID and e.ID = ?";
 	private static final String INSERT_QUERY = "INSERT INTO "
 			+ "EXPENSE(EXPID, APPDATE, CHANDATE, APPLICANT, TITLE, PAYEE, PRICE, STATUSID, CHANGER) "
 			+ "VALUES(?,?,?,?,?,?,?,?,?)";
 	private static final String UPDATE_QUERY = "UPDATE EXPENSE "
 			+ "SET EXPID=?,APPDATE=?,CHANDATE=?,APPLICANT=?,TITLE=?,PAYEE=?,PRICE=?,"
-			+ "STATUSID=?,CHANGER=? WHERE ID = ?";
+			+ "CHANGER=? WHERE ID = ?";
 	private static final String DELETE_QUERY = "DELETE FROM EXPENSE WHERE ID = ?";
 
 	/**

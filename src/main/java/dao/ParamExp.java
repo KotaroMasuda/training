@@ -7,7 +7,7 @@ import java.sql.SQLException;
  * DAOにクエリーパラムを引き渡すためのオブジェクト。
  */
 public class ParamExp {
-	private final static String BASE_WHERE_CLAUSE = " WHERE ";
+	private final static String BASE_WHERE_CLAUSE = "where e.STATUSID=s.ID ";
 
 	private int statusId;
 	private String applicantParam;
@@ -22,6 +22,7 @@ public class ParamExp {
 	public int getStatusId() {
 		return statusId;
 	}
+
 	public void setStatusId(int statusId) {
 		this.statusId = statusId;
 	}
@@ -29,15 +30,17 @@ public class ParamExp {
 	public String getApplicantParam() {
 		return applicantParam;
 	}
+
 	public void setApplicantParam(String applicantParam) {
-		this.applicantParam = applicantParam == null ? "" : "%"+applicantParam+"%";
+		this.applicantParam = applicantParam == null ? "" : "%" + applicantParam + "%";
 	}
 
 	public String getTitleParam() {
 		return titleParam;
 	}
+
 	public void setTitleParam(String titleParam) {
-		this.titleParam = titleParam == null ? "" : "%"+titleParam+"%";
+		this.titleParam = titleParam == null ? "" : "%" + titleParam + "%";
 	}
 
 	/**
@@ -47,33 +50,34 @@ public class ParamExp {
 	 */
 	public String getWhereClause() {
 		StringBuilder whereClause = new StringBuilder();
+		whereClause.append(BASE_WHERE_CLAUSE);
 		if (statusId != 0) {
 			if (whereClause.length() == 0) {
-				whereClause.append(BASE_WHERE_CLAUSE);
+//				whereClause.append(BASE_WHERE_CLAUSE);
 			} else {
 				whereClause.append(" AND ");
 			}
-			whereClause.append("E.STATUSID = ?");
+			whereClause.append("e.STATUSID = ?");
 		}
 		if (!applicantParam.isEmpty()) {
 			if (whereClause.length() == 0) {
-				whereClause.append(BASE_WHERE_CLAUSE);
+//				whereClause.append(BASE_WHERE_CLAUSE);
 			} else {
 				whereClause.append(" AND ");
 			}
-			whereClause.append("E.APPLICANT LIKE ?");
+			whereClause.append("e.APPLICANT LIKE ?");
 		}
 		if (!titleParam.isEmpty()) {
 			if (whereClause.length() == 0) {
-				whereClause.append(BASE_WHERE_CLAUSE);
+//				whereClause.append(BASE_WHERE_CLAUSE);
 			} else {
 				whereClause.append(" AND ");
 			}
-			whereClause.append("E.TITLE LIKE ?");
+			whereClause.append("e.TITLE LIKE ?");
 		}
 
 		// ORDER BYは最後に指定する
-		whereClause.append(" ORDER BY E.ID");
+		whereClause.append(" ORDER BY e.ID");
 
 		return whereClause.toString();
 	}
@@ -81,8 +85,10 @@ public class ParamExp {
 	/**
 	 * getWhereClauseメソッドで設定されたWHERE句を含むSQLにパラメータをセットする
 	 *
-	 * @param statement パラメータをセットする対象のPreparedStatement
-	 * @throws SQLException パラメータの設定時に何らかの問題があった場合
+	 * @param statement
+	 *            パラメータをセットする対象のPreparedStatement
+	 * @throws SQLException
+	 *             パラメータの設定時に何らかの問題があった場合
 	 */
 	public void setParameter(PreparedStatement statement) throws SQLException {
 		int count = 1;

@@ -13,8 +13,8 @@
 		<div id="list">
 			<form id="employeeSelector">
  				<div>
-					<label for="expenseStatusParam">ステータス:</label>
-					<select name="expenseStatusParam" id="expenseStatusParam">
+					<label for="expStatusParam">ステータス:</label>
+					<select name="expStatusParam" id="expStatusParam">
 					</select>
 				</div>
 				<div>
@@ -30,7 +30,7 @@
 			<p>経費一覧:</p>
 			<div id="expenses"></div>
 			<div id="insertBlock">
-				<button type="button" id="newExpense">新規申請</button>
+				<button type="button" id="newExpense" onclick="location.href='./NewExpense.html'">新規申請</button>
 			</div>
             <div>
 				<button id="downloadCsv" onclick="location.href='api/employees/csv'">CSVファイルに出力</button>
@@ -39,7 +39,7 @@
 	</div>
 
 	<script src="js/jquery-3.3.1.min.js"></script>
-	<script src="js/employee.js"></script>
+	<script src="js/expenseList.js"></script>
 
 </body>
 </html>
