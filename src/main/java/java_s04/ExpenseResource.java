@@ -80,19 +80,19 @@ public class ExpenseResource {
 		Expense expense = new Expense();
 
 		expense.setId(0);
-		expense.setExpenseId(form.getField("empId").getValue());
-		expense.setApplicant(form.getField("name").getValue());
-		expense.setTitle((form.getField("age").getValue()));
-		expense.setPayee((form.getField("age").getValue()));
-		expense.setPrice(Integer.parseInt(form.getField("age").getValue()));
-		expense.setChanger((form.getField("age").getValue()));
+		expense.setExpenseId(form.getField("expenseId").getValue());
+		expense.setApplicant(form.getField("applicant").getValue());
+		expense.setTitle((form.getField("title").getValue()));
+		expense.setPayee((form.getField("payee").getValue()));
+		expense.setPrice(Integer.parseInt(form.getField("price").getValue()));
+		expense.setChanger((form.getField("changer").getValue()));
 
-		String applyDateStr = form.getField("enterDate").getValue();
+		String applyDateStr = form.getField("applyDate").getValue();
 		if (applyDateStr != null && !applyDateStr.isEmpty()) {
 			expense.setApplyDate(applyDateStr);
 		}
 
-		String changeDateStr = form.getField("retireDate").getValue();
+		String changeDateStr = form.getField("changeDate").getValue();
 		if (changeDateStr != null && !changeDateStr.isEmpty()) {
 			expense.setChangeDate(changeDateStr);
 		}
@@ -102,7 +102,7 @@ public class ExpenseResource {
 		}
 
 		// Status関連の処理
-		int statusId = Integer.parseInt(form.getField("postId").getValue());
+		int statusId = Integer.parseInt(form.getField("statusId").getValue());
 		beans.Status status = statusDao.findById(statusId);
 		if (status == null) {
 			throw new WebApplicationException(Response.Status.BAD_REQUEST);

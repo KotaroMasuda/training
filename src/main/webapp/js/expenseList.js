@@ -58,13 +58,12 @@ $('#newExpense').click(function() {
 });
 
 function initPage() {
-	// htmlに<option>、つまりプルダウンが無いのでvar newOptionは使わない
-	// var newOption = $('<option>').val(0).text('指定しない').prop('selected',
-	// true);
-
-	// Status検索やろうとしたけどめんどいので止めます。
-	// $('#expenseStatusParam').append(newOption);
-	// makeStatusSelection('#expenseStatusParam');
+	 htmlに<option>、つまりプルダウンが無いのでvar newOptionは使わない
+	 var newOption = $('<option>').val(0).text('指定しない').prop('selected',
+	 true);
+	 Status検索やろうとしたけどめんどいので止めます。
+	 $('#expenseStatusParam').append(newOption);
+	 makeStatusSelection('#expenseStatusParam');
 	findAll();
 }
 
