@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 
 import beans.Expense;
+import beans.Status;
 import dao.ExpenseDAO;
 import dao.ParamExp;
 import dao.StatusDAO;
@@ -101,13 +102,15 @@ public class ExpenseResource {
 //			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 //		}
 
-		// Status関連の処理
+		//Status関連の処理
 //		int statusId = Integer.parseInt(form.getField("statusId").getValue());
 //		beans.Status status = statusDao.findById(statusId);
 //		if (status == null) {
 //			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 //		}
-//		expense.setStatus(status);
+		Status status = new Status();
+		status.setId(1);
+		expense.setStatus(status);
 
 		return expDao.create(expense);
 	}

@@ -118,21 +118,21 @@ public class Expense {
 			return false;
 		}
 		if ((applicant == null) || (applicant.getBytes().length > MAX_APPLICANT_LENGTH)) {
-			System.err.println("Employee: Bad applicant length.");
+			System.err.println("Expense: Bad applicant length.");
 			return false;
 		}
 		if ((title == null) || (title.getBytes().length > MAX_TITLE_LENGTH)) {
-			System.err.println("Employee: Bad title length.");
+			System.err.println("Expense: Bad title length.");
 			return false;
 		}
 		if ((payee == null) || (payee.getBytes().length > MAX_PAYEE_LENGTH)) {
-			System.err.println("Employee: Bad payee length.");
+			System.err.println("Expense: Bad payee length.");
 			return false;
 		}
-		if ((changer == null) || (changer.getBytes().length > MAX_CHANGER_LENGTH)) {
-			System.err.println("Employee: Bad changer length.");
-			return false;
-		}
+//		if ((changer == null) || (changer.getBytes().length > MAX_CHANGER_LENGTH)) {
+//			System.err.println("Expense: Bad changer length.");
+//			return false;
+//		}
 		return true;
 	}
 

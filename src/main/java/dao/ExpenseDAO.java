@@ -23,8 +23,8 @@ public class ExpenseDAO {
 			+ "s.TYPE as STATUS_TYPE, \n" + "e.CHANGER from EXPENSE e, STATUS s ";
 	private static final String SELECT_BY_ID_QUERY = SELECT_ALL_QUERY + " WHERE e.STATUSID=s.ID and e.ID = ?";
 	private static final String INSERT_QUERY = "INSERT INTO "
-			+ "EXPENSE(ID, EXPID, APPDATE, APPLICANT, TITLE, PAYEE, PRICE, STATUSID) "
-			+ "VALUES(WEBAPP.EXPENSE_SEQ.nextval,?,?,?,?,?,?,1)";
+			+ "EXPENSE(ID, EXPID, APPDATE, CHANDATE, APPLICANT, TITLE, PAYEE, PRICE, STATUSID, CHANGER)"
+			+ "VALUES(WEBAPP.EXPENSE_SEQ.nextval,?,?,?,?,?,?,?,1,?)";
 	private static final String UPDATE_QUERY = "UPDATE EXPENSE "
 			+ "SET EXPID=?,APPDATE=?,CHANDATE=?,APPLICANT=?,TITLE=?,PAYEE=?,PRICE=?,"
 			+ "CHANGER=? WHERE ID = ?";
@@ -234,12 +234,6 @@ public class ExpenseDAO {
 		int count = 1;
 
 		statement.setString(count++, expense.getExpenseId());
-		statement.setString(count++, expense.getApplicant());
-		statement.setString(count++, expense.getTitle());
-		statement.setString(count++, expense.getPayee());
-		statement.setInt(count++, expense.getPrice());
-		statement.setInt(count++, expense.getStatus().getId());
-		statement.setString(count++, expense.getChanger());
 		if (expense.getApplyDate() != null) {
 			statement.setDate(count++, Date.valueOf(expense.getApplyDate()));
 		} else {
@@ -250,6 +244,13 @@ public class ExpenseDAO {
 		} else {
 			statement.setDate(count++, null);
 		}
+		statement.setString(count++, expense.getApplicant());
+		statement.setString(count++, expense.getTitle());
+		statement.setString(count++, expense.getPayee());
+		statement.setInt(count++, expense.getPrice());
+//		statement.setInt(count++, expense.getStatus().getId());
+//		statement.setInt(count++, 1);
+		statement.setString(count++, expense.getChanger());
 
 		if (forUpdate) {
 			statement.setInt(count++, expense.getId());
