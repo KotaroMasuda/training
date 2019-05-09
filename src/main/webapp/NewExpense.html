@@ -12,27 +12,37 @@
 	<div class="main clearfix">
 		<div id="detail">
 			<p>経費詳細データ：</p>
-			<form id="employeeForm" enctype="multipart/form-data">
+			<form id="expenseForm" enctype="multipart/form-data">
 				<div class="error"></div>
 				<div>
-					<label for="id">申請ID:</label>
+					<label for="id">ID:</label>
 					<input type="text" name="id" id="id" disabled>
 				</div>
 				<div>
-					<label for="applyYMD">申請日:</label>
-					<input type="text" name="applyYMD" id="applyYMD" placeholder="2019-4-1">
+					<label for="expenseId">経費ID:</label>
+					<input type="text" name="expenseId" id="expenseId">
 				</div>
 				<div>
-					<label for="updateYMD">更新日:</label>
-					<input type="text" name="updateYMD" id="updateYMD" placeholder="2019-4-1">
+					<label for="applyDate">申請日:</label>
+					<input type="text" name="applyDate" id="applyDate" placeholder="2019-4-1">
 				</div>
+<!--
+				<div>
+					<label for="changeDate">更新日:</label>
+					<input type="text" name="changeDate" id="changeDate" placeholder="2019-4-1">
+				</div>
+-->
 				<div>
 					<label for="applicant">申請者:</label>
-					<input type="text" maxlength="10" name="applicant" id="applicant">
+					<input type="text" maxlength="10" name="applicant" id="applicant" value="taro" readonly>
 				</div>
 				<div>
 					<label for="title">タイトル:</label>
-					<input type="text" maxlength="30" name="title" id="title">
+					<input type="text" maxlength="100" name="title" id="title">
+				</div>
+				<div>
+					<label for="payee">支払先:</label>
+					<input type="text" maxlength="100" name="payee" id="payee">
 				</div>
 				<div>
 					<label for="price">金額:</label>
@@ -40,6 +50,7 @@
 				</div>
             	<div>
 					<button id="applyExpense">申請</button>
+					<button type="button" id="backToList" onclick="location.href='./ExpenseList.html'">一覧に戻る</button>
             	</div>
 			</form>
 		</div>

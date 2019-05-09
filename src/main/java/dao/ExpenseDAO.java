@@ -23,8 +23,8 @@ public class ExpenseDAO {
 			+ "s.TYPE as STATUS_TYPE, \n" + "e.CHANGER from EXPENSE e, STATUS s ";
 	private static final String SELECT_BY_ID_QUERY = SELECT_ALL_QUERY + " WHERE e.STATUSID=s.ID and e.ID = ?";
 	private static final String INSERT_QUERY = "INSERT INTO "
-			+ "EXPENSE(EXPID, APPDATE, CHANDATE, APPLICANT, TITLE, PAYEE, PRICE, STATUSID, CHANGER) "
-			+ "VALUES(?,?,?,?,?,?,?,?,?)";
+			+ "EXPENSE(ID, EXPID, APPDATE, APPLICANT, TITLE, PAYEE, PRICE, STATUSID) "
+			+ "VALUES(WEBAPP.EXPENSE_SEQ.nextval,?,?,?,?,?,?,1)";
 	private static final String UPDATE_QUERY = "UPDATE EXPENSE "
 			+ "SET EXPID=?,APPDATE=?,CHANDATE=?,APPLICANT=?,TITLE=?,PAYEE=?,PRICE=?,"
 			+ "CHANGER=? WHERE ID = ?";
