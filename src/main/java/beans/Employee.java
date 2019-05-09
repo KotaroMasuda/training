@@ -13,24 +13,6 @@ public class Employee {
 	public static final int MAX_PREF_LENGTH = 20;
 	public static final int MAX_ADDRESS_LENGTH = 100;
 
-//	private int id;
-//	private String expenseId;
-//	private String applyDate;
-//	private String changeDate;
-//	private String applicant;
-//	private String title;
-//	private String payee;
-//	private int price;
-//	private Status status;
-//	private String changer;
-//	public static final int MAX_EXPID_LENGTH = 10;
-//	public static final int MAX_APPLICANT_LENGTH = 20;
-//	public static final int MAX_TITLE_LENGTH = 100;
-//	public static final int MAX_PAYEE_LENGTH = 20;
-//	public static final int MAX_CHANGER_LENGTH = 10;
-
-
-
 
 	/**
 	 * 保持データ
